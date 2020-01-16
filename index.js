@@ -1,53 +1,38 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const parseInteger = require('./helpers/parseInt');
-const ejs = require('ejs');
-const app = express();
-const port = 3000;
+const util = require("util");
+const exec = util.promisify(require("child_process").exec);
+const npmInstall = async () => {
+  const { stdout, stderr } = await exec("npm install");
+  if (stderr) {
+    if (process.env.NODE_ENV == "dev") {
+      console.error(`error: ${stderr}`);
+    } else {
+      console.log(
+        "There are a few errors. The program might crash. Contact Aditya for resolving."
+      );
+    }
+  }
+};
+const start = async () => {
+  const { stdout, stderr } = await exec("git pull");
 
-app.set('view engine', 'html');
-app.engine('html', ejs.renderFile);
+  if (stderr) {
+    if (process.env.NODE_ENV == "dev") {
+      console.error(`error: ${stderr}`);
+    } else {
+      console.log(
+        "There are a few errors. The program will still continue to function without new functionality. Contact Aditya for resolving."
+      );
+    }
+  } else {
+    console.log("Got latest version of the app.");
+  }
+  if (stdout && stdout.indexOf("install") >= 0) {
+    console.log("New Module Installation Required. Installing Now.");
+    await npmInstall();
+  }
+  // console.log(stdout);
 
-app.use(bodyParser.urlencoded({ extended: true }));
+  require("./app");
+};
 
-let simpleQRGenerator = require('./helpers/qr_generators/simple');
-
-app.get('/', (req, res) => res.send('Hello World!'));
-
-app.get('/qr', (req, res) => {
-  let qr = simpleQRGenerator();
-  res.type('png');
-  qr.pipe(res);
-});
-
-app.get('/generateSticker', (req, res) => {
-  res.render('generateSticker');
-})
-app.post('/generateSticker', function (req, res) {
-  // const {
-  //   baseFile,
-  //   qrx, qry,
-  //   qrSize,
-  //   text1x, text1y,
-  //   batch, batchx, batchy,
-  //   xlName,
-  //   outputFolder
-  // } = req.body;
-  const pool = require('./helpers/qr_generators/singleImageWithQr/pool_singleImageWithQr');
-  let formData = parseInteger(req.body,
-    ['qrSize', 'qrx', 'qry', 'text1x', 'text1y', 'startRow', 'endRow', 'batchx', 'batchy']
-  )
-  // console.log(formData);
-  pool(formData);
-  res.redirect('/success');
-  // res.send("Image Generation Started. See logs for more details");
-});
-
-
-
-app.get('/success', (req, res) => {
-  res.send("Image Generation Started. See logs for more details. Generated Images will appear under images/generated folder.");
-})
-
-
-app.listen(port, () => console.log(`App is listening at http://localhost:${port}`));
+start();

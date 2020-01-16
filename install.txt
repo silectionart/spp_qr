@@ -1,0 +1,2 @@
+Install Git
+Install Node.js
