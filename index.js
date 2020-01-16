@@ -13,6 +13,7 @@ const npmInstall = async () => {
   }
 };
 const start = async () => {
+  await exec("git stash");
   const { stdout, stderr } = await exec("git pull");
 
   if (stderr) {

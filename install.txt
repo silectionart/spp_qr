@@ -4,5 +4,5 @@ Install Git
 Install Node.js
   - https://nodejs.org/en/download/
 
-Inside any directory (not c directory), open command prompt (shift + right click > Open Command Prompt Here) and type
+Inside any directory (not c directory), open command prompt (right click > Git Bash Here) and type
   git clone https://github.com/silectionart/spp_qr.git
