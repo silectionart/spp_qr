@@ -1,35 +1,73 @@
-const jimp = require('jimp');
+const jimp = require("jimp");
 
-const blitSingleSided = async (uid, VPA, batch, genData) => {
-  const mainImage = await jimp.read('images/input/' + genData.baseFile);
-  const qrImage = await jimp.read('images/generated/' + genData.outputFolder + '/qr/' + batch + '.png');
+const blitSingleSided = async (uid, VPA, batch, genData, merchantName) => {
+  const mainImage = await jimp.read("images/input/" + genData.baseFile);
+  const qrImage = await jimp.read(
+    "images/generated/" + genData.outputFolder + "/qr/" + batch + ".png"
+  );
   const font = await jimp.loadFont(jimp.FONT_SANS_32_WHITE);
+  const font2 = await jimp.loadFont(jimp.FONT_SANS_64_BLACK);
   // const font = await jimp.loadFont('fonts/opensans_56.fnt');
   // const font = await jimp.loadFont('fonts/opensans_48-80.fnt');
-  await qrImage.resize(genData.qrSize, genData.qrSize).write('images/generated/' + genData.outputFolder + '/qr/' + batch + '.png');
+  await qrImage
+    .resize(genData.qrSize, genData.qrSize)
+    .write(
+      "images/generated/" + genData.outputFolder + "/qr/" + batch + ".png"
+    );
 
   //max size 658, sides 320
 
   let textSize = await jimp.measureText(font, VPA);
+  let merchantTextSize = 0;
+  if (merchantName) {
+    merchantTextSize = await jimp.measureText(font2, merchantName);
+  }
 
   // 1289 by 254
   // xy 34:185
   let useLogo = false;
   if (useLogo) {
-    let logo = await jimp.read('images/generated/logos/1sidelogo.jpg');
-    mainImage.blit(qrImage, genData.qrx, genData.qry)
+    let logo = await jimp.read("images/generated/logos/1sidelogo.jpg");
+    mainImage
+      .blit(qrImage, genData.qrx, genData.qry)
       .blit(logo, 0, mainImage.getHeight() - 254)
-      .print(font, (182 + (932 - textSize) / 2), 1450, VPA)
+      .print(font, 182 + (932 - textSize) / 2, 1450, VPA)
       .print(font, 27, 1670, batch)
-      .write('images/generated/sticker1sided/' + batch + '.jpg');
+      .write("images/generated/sticker1sided/" + batch + ".jpg");
   } else {
-    mainImage.blit(qrImage, genData.qrx, genData.qry)
-      .print(font, (genData.text1x + ((genData.qrSize) - textSize) / 2), genData.text1y, VPA)
+    mainImage
+      .blit(qrImage, genData.qrx, genData.qry)
+      .print(
+        font,
+        genData.text1x + (genData.qrSize - textSize) / 2,
+        genData.text1y,
+        VPA
+      )
       // .print(font, genData.text1x, genData.text1y, VPA)
-      .print(font, genData.batchx, genData.batchy, batch)
-      .write('images/generated/' + genData.outputFolder + '/sticker1sided/' + batch + '.jpg');
+      .print(font, genData.batchx, genData.batchy, batch);
+    if (merchantName) {
+      let merchantBoxStartX = 99;
+      let merchantBoxStartY = 808;
+      let merchantBoxEndX = 578;
+      let merchantBoxEndY = 981;
+      mainImage.print(
+        font2,
+        merchantBoxStartX +
+          (merchantBoxEndX - merchantBoxStartX) / 2 -
+          merchantTextSize / 2,
+        merchantBoxStartY + (merchantBoxEndY - merchantBoxStartY) / 2 - 64 / 2,
+        merchantName
+      );
+    }
+    mainImage.write(
+      "images/generated/" +
+        genData.outputFolder +
+        "/sticker1sided/" +
+        batch +
+        ".jpg"
+    );
   }
-}
+};
 
 // let VPA = "Mswipe.1400030819094128@kotak";
 // let batch = "R8-094128"

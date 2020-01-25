@@ -8,9 +8,8 @@
 /**
  * Dependencies
  */
-var childProcess = require('child_process');
-var generic = require('generic-pool');
-
+var childProcess = require("child_process");
+var generic = require("generic-pool");
 
 // class Pool {
 //     constructor(path, args, options, settings) {
@@ -29,7 +28,6 @@ var generic = require('generic-pool');
 //         this.init = this.init.bind(this);
 //         this.enque = this.enque.bind(this);
 //     }
-
 
 //     init = () => {
 //         this.pool = generic.createPool({
@@ -99,57 +97,65 @@ var generic = require('generic-pool');
 
 // }
 
-
 class Pool {
-    constructor(path) {
-        const factory = {
-            create: function () {
-                return childProcess.fork(path);
-            },
-            destroy: function (client) {
-                client.kill();
-            }
-        }
-        const size = require('os').cpus().length;
-        const opts = {
-            max: size,
-            min: size - 1,
-            name: "fork-pool",
-            idleTimeoutMillis: 30000
-        }
-        this.pool = generic.createPool(factory, opts);
-        // this.enque = enque;
-    }
-
-    enqueue(data, callback) {
-        let instance = this.pool;
-        instance.acquire().then(client => {
-            client.send(data);
-            client.once('message', message => {
-                let a = {
-                    pid: client.pid,
-                    stdout: message
-                };
-                instance.release(client);
-                callback(null, a);
-
-            })
-        }).catch(err => {
-            callback(err);
-        })
+  constructor(path) {
+    const factory = {
+      create: function() {
+        return childProcess.fork(path);
+      },
+      destroy: function(client) {
+        client.kill();
+      }
     };
-
-    get available() {
-        return this.pool.available;
+    const size = require("os").cpus().length;
+    const opts = {
+      max: size,
+      min: size - 1,
+      name: "fork-pool",
+      idleTimeoutMillis: 30000
     };
+    this.pool = generic.createPool(factory, opts);
+    // this.enque = enque;
+  }
 
-    drain() {
-        let instance = this.pool;
-        instance.drain().then(() => {
-            return instance.clear();
-        }).then(() => {
-            console.log("Drained queue");
-        })
-    };
+  enqueue(data, callback) {
+    let instance = this.pool;
+    instance
+      .acquire()
+      .then(client => {
+        client.send(data);
+        client.once("message", message => {
+          let a = {
+            pid: client.pid,
+            stdout: message
+          };
+          instance.release(client);
+          callback(null, a);
+        });
+      })
+      .catch(err => {
+        callback(err);
+      });
+  }
+
+  get available() {
+    return this.pool.available;
+  }
+
+  timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  async drain() {
+    await this.timeout(10000);
+    let instance = this.pool;
+    instance
+      .drain()
+      .then(() => {
+        return instance.clear();
+      })
+      .then(() => {
+        console.log("Drained queue");
+      });
+  }
 }
 module.exports = Pool;

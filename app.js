@@ -64,5 +64,7 @@ app.get("/success", (req, res) => {
 
 app.listen(port, () => {
   console.log(`App is listening at http://localhost:${port}`);
-  open("http://127.0.0.1:" + port + "/generateSticker");
+  if (process.env.NODE_ENV != "dev") {
+    open("http://127.0.0.1:" + port + "/generateSticker");
+  }
 });
