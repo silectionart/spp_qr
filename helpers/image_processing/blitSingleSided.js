@@ -6,7 +6,15 @@ const blitSingleSided = async (uid, VPA, batch, genData, merchantName) => {
     "images/generated/" + genData.outputFolder + "/qr/" + batch + ".png"
   );
   const font = await jimp.loadFont(jimp.FONT_SANS_32_WHITE);
-  const font2 = await jimp.loadFont(jimp.FONT_SANS_64_BLACK);
+  let font2;
+  if (
+    merchantName.length <= 12 &&
+    merchantName.replace(/[^A-Z]/g, "").length <= 6
+  ) {
+    font2 = await jimp.loadFont(jimp.FONT_SANS_64_BLACK);
+  } else {
+    font2 = await jimp.loadFont(jimp.FONT_SANS_32_BLACK);
+  }
   // const font = await jimp.loadFont('fonts/opensans_56.fnt');
   // const font = await jimp.loadFont('fonts/opensans_48-80.fnt');
   await qrImage
@@ -50,14 +58,31 @@ const blitSingleSided = async (uid, VPA, batch, genData, merchantName) => {
       let merchantBoxStartY = 808;
       let merchantBoxEndX = 578;
       let merchantBoxEndY = 981;
-      mainImage.print(
-        font2,
-        merchantBoxStartX +
-          (merchantBoxEndX - merchantBoxStartX) / 2 -
-          merchantTextSize / 2,
-        merchantBoxStartY + (merchantBoxEndY - merchantBoxStartY) / 2 - 64 / 2,
-        merchantName
-      );
+      if (merchantTextSize < merchantBoxEndX - merchantBoxStartX - 20) {
+        mainImage.print(
+          font2,
+          merchantBoxStartX +
+            (merchantBoxEndX - merchantBoxStartX) / 2 -
+            merchantTextSize / 2,
+          merchantBoxStartY +
+            (merchantBoxEndY - merchantBoxStartY) / 2 -
+            64 / 2,
+          merchantName
+        );
+      } else {
+        mainImage.print(
+          font2,
+          merchantBoxStartX + 10,
+          merchantBoxStartY + 10,
+          {
+            text: merchantName,
+            alignmentX: jimp.HORIZONTAL_ALIGN_CENTER,
+            alignmentY: jimp.VERTICAL_ALIGN_MIDDLE
+          },
+          merchantBoxEndX - merchantBoxStartX - 20,
+          merchantBoxEndY - merchantBoxStartY - 20
+        );
+      }
     }
     mainImage.write(
       "images/generated/" +
