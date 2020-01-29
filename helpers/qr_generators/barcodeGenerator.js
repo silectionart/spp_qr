@@ -7,7 +7,9 @@ const barcodeGenerator = async (uid, barcode, batch, genData) => {
   //   barcode = barcode.split('@')[0];
   // }
 
-  barcode = barcode.match(/[^\.]+(?=@)/g);
+  if (barcode.match(/[^\.]+(?=@)/g)) {
+    barcode = barcode.match(/[^\.]+(?=@)/g);
+  }
   let canvas = Canvas.createCanvas();
 
   // console.log(canvas.width + ' and height is ' + canvas.height);

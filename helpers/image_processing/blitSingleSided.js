@@ -8,6 +8,7 @@ const blitSingleSided = async (uid, VPA, batch, genData, merchantName) => {
   const font = await jimp.loadFont(jimp.FONT_SANS_32_WHITE);
   let font2;
   if (
+    merchantName &&
     merchantName.length <= 12 &&
     merchantName.replace(/[^A-Z]/g, "").length <= 6
   ) {
