@@ -6,3 +6,11 @@ Install Node.js
 
 Inside any directory (not c directory), open command prompt (right click > Git Bash Here) and type
   git clone https://github.com/silectionart/spp_qr.git
+  
+In the command window, type 
+  cd spp_qr
+
+After that in command window type
+  npm install
+
+after that open startServer.bat by double clicking on file
