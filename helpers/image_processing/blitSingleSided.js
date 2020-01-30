@@ -7,14 +7,16 @@ const blitSingleSided = async (uid, VPA, batch, genData, merchantName) => {
   );
   const font = await jimp.loadFont(jimp.FONT_SANS_32_WHITE);
   let font2;
-  if (
-    merchantName &&
-    merchantName.length <= 12 &&
-    merchantName.replace(/[^A-Z]/g, "").length <= 6
-  ) {
+  // if (
+  //   merchantName &&
+  //   merchantName.length <= 12 &&
+  //   merchantName.replace(/[^A-Z]/g, "").length <= 6
+  // ) {
+  if (false) {
     font2 = await jimp.loadFont(jimp.FONT_SANS_64_BLACK);
   } else {
-    font2 = await jimp.loadFont(jimp.FONT_SANS_32_BLACK);
+    // font2 = await jimp.loadFont(jimp.FONT_SANS_16_BLACK);
+    font2 = await jimp.loadFont("fonts/opensans24.fnt");
   }
   // const font = await jimp.loadFont('fonts/opensans_56.fnt');
   // const font = await jimp.loadFont('fonts/opensans_48-80.fnt');
@@ -55,11 +57,12 @@ const blitSingleSided = async (uid, VPA, batch, genData, merchantName) => {
       // .print(font, genData.text1x, genData.text1y, VPA)
       .print(font, genData.batchx, genData.batchy, batch);
     if (merchantName) {
-      let merchantBoxStartX = 99;
-      let merchantBoxStartY = 808;
-      let merchantBoxEndX = 578;
-      let merchantBoxEndY = 981;
-      if (merchantTextSize < merchantBoxEndX - merchantBoxStartX - 20) {
+      let merchantBoxStartX = 95;
+      let merchantBoxStartY = 888;
+      let merchantBoxEndX = 568;
+      let merchantBoxEndY = 965;
+      // if (merchantTextSize < merchantBoxEndX - merchantBoxStartX - 20) {
+      if (false) {
         mainImage.print(
           font2,
           merchantBoxStartX +
