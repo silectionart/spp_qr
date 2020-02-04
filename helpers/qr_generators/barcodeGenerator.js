@@ -30,9 +30,10 @@ const barcodeGenerator = async (uid, barcode, batch, genData) => {
   ctx.moveTo(0, 150);
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 150, 575, 30);
-  ctx.font = '24px "Sans"';
+  ctx.font = 'bold 24px "Sans"';
   ctx.fillStyle = "#000000";
-  ctx.fillText(batch, 424, 162);
+  ctx.textAlign = "center";
+  ctx.fillText(batch, 287, 162);
   ctx.save();
   // console.log(ctx.canvas.width + ' and height is ' + ctx.canvas.height);
   const out = fs.createWriteStream(
